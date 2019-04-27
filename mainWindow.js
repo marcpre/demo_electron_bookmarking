@@ -13,7 +13,10 @@ exports.createWindow = () => {
     height: 650,
     minWidth: 350,
     maxWidth: 650,
-    minHeight: 310
+    minHeight: 310,
+    webPreferences: {
+      webviewTag: true
+    }
   })
 
   // Devtools
