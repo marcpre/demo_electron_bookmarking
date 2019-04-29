@@ -28,6 +28,25 @@ exports.changeItem = (direction) => {
   }
 }
 
+window.deleteItem = (i) => {
+  $('.read-item').eq(i).remove()
+
+  this.toreadItems = this.toreadItems.filter((item, index) => {
+    return index !== i
+  })
+
+  this.saveItems()
+
+  if (this.toreadItems.length) {
+
+    let newIndex = (i === 0) ? 0 : i - 1;
+    $('.read-item').eq(newIndex).addClass('is-active')
+  } else {
+    
+    $('no-items').show()
+  }
+}
+
 // Open item for reading
 exports.openItem = () => {
 
@@ -40,7 +59,9 @@ exports.openItem = () => {
   // Get item's content url
   let contentURL = encodeURIComponent(targetItem.data('url'))
 
-  let readerWinURL = `file://${__dirname}/renderer.html?url=${contentURL}`
+  let itemIndex = targetItem.index() - 1
+
+  let readerWinURL = `file://${__dirname}/renderer.html?url=${contentURL}&itemIndex=${itemIndex}`
 
   // Open item in new proxy BrowserWindow
   let readerWin = window.open(readerWinURL, targetItem.data('title'))

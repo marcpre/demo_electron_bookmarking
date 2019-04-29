@@ -38,6 +38,15 @@
         </div>
     </section>
 
+    <a id="mark-read" class="is-hidden">
+        <div class="block">
+            <span class="tag is-large is-primary">
+                <span class="icon">
+                    <i class="fa fa-check fa-inverse"></i>
+                </span>&nbsp; Read
+            </span>
+        </div>
+    </a>
 
     <webview src="about:blank"></webview>
 
@@ -51,6 +60,8 @@
         // Parse query string
         const queryParams = queryString.parse(location.search)
 
+        let itemIndex = queryParams.itemIndex
+
         // Get query string 'url'
         let url = decodeURIComponent(queryParams.url)
 
@@ -60,6 +71,8 @@
             // Load item content url into webview
             e.currentTarget.loadURL(url)
 
+            $('mark-read').removeClass('is-hidden')
+
         }).one('did-finish-load', () => {
 
             // Hide loader to reveal webview
@@ -68,9 +81,15 @@
             // Handle failed load
         }).on('did-fail-load', () => {
 
+            $('mark-read').addClass('is-hidden')
             $('#loader .busy').addClass('is-hidden')
             $('#loader').fadeIn(100)
             $('#loader .failed').removeClass('is-hidden')
+        })
+
+        $('mark-read').click(() => {
+            window.opener.eval(`deleteItem(${itemIndex})`)
+            window.close()
         })
     </script>
 
