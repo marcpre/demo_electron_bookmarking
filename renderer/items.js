@@ -1,3 +1,4 @@
+
 // Track items with array
 exports.toreadItems = JSON.parse(localStorage.getItem('toreadItems')) || []
 
@@ -22,46 +23,77 @@ exports.changeItem = (direction) => {
   let newItem = (direction === 'down') ? activeItem.next('.read-item') : activeItem.prev('.read-item')
 
   // Only if item exists, make selection change
-  if (newItem.length) {
+  if(newItem.length) {
     activeItem.removeClass('is-active')
     newItem.addClass('is-active')
   }
 }
 
-window.deleteItem = (i) => {
+
+// Window function
+// Delete item by index
+window.deleteItem = (i = false) => {
+
+  // Set i to active item if not passed as argument
+  if (i === false) i = ($('.read-item.is-active').index() - 1)
+
+  // Remove item from DOM
   $('.read-item').eq(i).remove()
 
+  // Remove from toreadItems array
   this.toreadItems = this.toreadItems.filter((item, index) => {
     return index !== i
   })
 
+  // Update storage
   this.saveItems()
 
+  // Select prev item or none if list empty
   if (this.toreadItems.length) {
 
-    let newIndex = (i === 0) ? 0 : i - 1;
+    // If first item was deleted, select new first item in list, else previous item
+    let newIndex = (i === 0) ? 0 : i - 1
+
+    // Assign active class to new index
     $('.read-item').eq(newIndex).addClass('is-active')
+
+  // Else show 'no items' message
   } else {
-    
-    $('no-items').show()
+    $('#no-items').show()
   }
 }
 
-// Open item for reading
-exports.openItem = () => {
+// Open item in default browser
+window.openInBrowser = () => {
 
-  // Only if items have been added
-  if (!this.toreadItems.length) return
+  // Only if items exists
+  if ( !this.toreadItems.length ) return
 
   // Get selected item
   let targetItem = $('.read-item.is-active')
 
-  // Get item's content url
+  // Open in Browser
+  require('electron').shell.openExternal(targetItem.data('url'))
+}
+
+
+// Open item for reading
+window.openItem = () => {
+
+  // Only if items have been added
+  if( !this.toreadItems.length ) return
+
+  // Get selected item
+  let targetItem = $('.read-item.is-active')
+
+  // Get item's content url (encoded)
   let contentURL = encodeURIComponent(targetItem.data('url'))
 
+  // Get item index to pass to proxy window
   let itemIndex = targetItem.index() - 1
 
-  let readerWinURL = `file://${__dirname}/renderer.html?url=${contentURL}&itemIndex=${itemIndex}`
+  // Reader window URL
+  let readerWinURL = `file://${__dirname}/reader.html?url=${contentURL}&itemIndex=${itemIndex}`
 
   // Open item in new proxy BrowserWindow
   let readerWin = window.open(readerWinURL, targetItem.data('title'))
@@ -87,5 +119,5 @@ exports.addItem = (item) => {
   $('.read-item')
     .off('click, dblclick')
     .on('click', this.selectItem)
-    .on('dblclick', this.openItem)
+    .on('dblclick', window.openItem)
 }
