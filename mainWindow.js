@@ -16,11 +16,12 @@ exports.createWindow = () => {
     minHeight: 310,
     webPreferences: {
       webviewTag: true
-    }
+    },
+    icon: `${__dirname}/icons/64x64.png`
   })
 
   // Devtools
-  this.win.webContents.openDevTools()
+  // this.win.webContents.openDevTools()
 
   // Load main window content
   this.win.loadURL(`file://${__dirname}/renderer/main.html`)
